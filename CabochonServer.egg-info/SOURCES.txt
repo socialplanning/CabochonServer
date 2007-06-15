@@ -1,0 +1,9 @@
+setup.cfg
+setup.py
+CabochonServer.egg-info/PKG-INFO
+CabochonServer.egg-info/SOURCES.txt
+CabochonServer.egg-info/dependency_links.txt
+CabochonServer.egg-info/entry_points.txt
+CabochonServer.egg-info/not-zip-safe
+CabochonServer.egg-info/top_level.txt
+cabochonserver/__init__.py
