@@ -35,10 +35,18 @@ class ServerInstaller:
 
     def removeEvent(self, server, event, url):
         rm = []
-        for event in self.events:
-            if event[0:3] == (server, event, url):
-                rm.append(event)
+        for candidate in self.events:
+            if candidate[0:3] == (server, event, url):
+                rm.append(candidate)
 
-        for event in rm:
-            events.remove(rm)
+        for candidate in rm:
+            (server, event, url) = candidate
             rest_invoke(server + "unsubscribe_by_event", method="POST", params={'url' : url, 'event' : event})
+            events.remove(candidate)
+
+
+    def removeAll(self):
+        for e in self.events:
+            (server, event, url) = e
+            rest_invoke(server + "unsubscribe_by_event", method="POST", params={'url' : url, 'event' : event})
+            events.remove(e)

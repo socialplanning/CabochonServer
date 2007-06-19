@@ -1,7 +1,7 @@
 from setuptools import setup, find_packages
 import sys, os
 
-version = '0.0'
+version = '0.1'
 
 setup(name='CabochonServer',
       version=version,
@@ -12,8 +12,8 @@ setup(name='CabochonServer',
       keywords='',
       author='David Turner',
       author_email='novalis@openplans.org',
-      url='',
-      license='GPL',
+      url='http://www.openplans.org/projects/cabochon',
+      license='GPLv2 or any later version',
       packages=find_packages(exclude=['ez_setup', 'examples', 'tests']),
       include_package_data=True,
       zip_safe=False,
