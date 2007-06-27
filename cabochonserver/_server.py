@@ -1,5 +1,12 @@
 from restclient import rest_invoke
-from simplejson import loads as fromjson
+from simplejson import loads
+
+def fromjson(json):
+    try:
+        return loads(json)
+    except:
+        print "Failed to load json from", json
+        raise
 
 class ServerInstaller:
     def __init__(self, config_file):
