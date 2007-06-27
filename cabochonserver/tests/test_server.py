@@ -7,8 +7,10 @@ import time
 from paste.util.multidict import MultiDict
 
 def test_server():
+    print "Don't forget to start the event sender"
     test_server = CabochonTestServer()
     test_server.start()
+    time.sleep(0.01) #time for the first line of the new thread to run
     server_fixture = test_server.server_fixture
 
     server_url = "http://localhost:24532"
@@ -25,7 +27,7 @@ def test_server():
 
     #get the fire url
 
-    urls = fromjson(rest_invoke(server_url + "/event/", method="POST", params={'name':event_name}))
+    urls = fromjson(rest_invoke(server_url + "/event", method="POST", params={'name':event_name}))
     fire_url = urls['fire']
 
     #fire the event
@@ -33,7 +35,6 @@ def test_server():
 
     #wait a second
     time.sleep(1)
-
     #insure that we got it
     assert server_fixture.requests_received == [{'path': '/example/1', 'params': MultiDict([('morx', 'fleem')]), 'method': 'POST'}]            
 
