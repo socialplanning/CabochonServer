@@ -33,7 +33,6 @@ class ServerInstaller:
         
     def addEvent(self, server, event, url, method="POST"):
         self.events.append((server, event, url, method))
-
         #create the event
         urls = fromjson(rest_invoke(server + "/event/", method="POST", params={"name" : event}))
         subscribe_url = urls['subscribe']
