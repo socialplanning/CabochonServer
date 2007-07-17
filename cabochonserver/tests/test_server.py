@@ -1,10 +1,32 @@
-from restclient import rest_invoke
+from restclient import rest_invoke as base_rest_invoke
 from cabochonserver import ServerInstaller
 from cabochon.tests.functional import CabochonTestServer
+from cabochonclient import wsse_header
 from simplejson import loads as fromjson
 import os
 import time
+from random import random
+from datetime import datetime
+from sha import sha
 from paste.util.multidict import MultiDict
+
+username = 'topp'
+password = 'secret'
+
+#if your cabochon environment does not permit wsse auth,
+#uncomment the following line, and comment out the method
+
+#rest_invoke = base_rest_invoke
+
+def rest_invoke(*args, **kwargs):
+    #merge in wsse headers
+
+    headers = kwargs.get('headers', {})
+    headers['Authorization'] = 'WSSE profile="UsernameToken"'
+    headers['X-WSSE'] = wsse_header(username, password)
+
+    kwargs['headers'] = headers
+    return base_rest_invoke(*args, **kwargs)
 
 def test_server():
     print "Don't forget to start the event sender"
@@ -21,7 +43,7 @@ def test_server():
 
     event_name = "cabochon_server_library_test_event"
 
-    installer = ServerInstaller(".servers")
+    installer = ServerInstaller(".servers", username=username, password=password)
     installer.addEvent(server_url, event_name, "http://localhost:10424/example/1")
     installer.save()
 
