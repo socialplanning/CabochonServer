@@ -52,7 +52,7 @@ class ServerInstaller:
         urls = fromjson(self.rest_invoke(server + "/event/", method="POST", params={"name" : event}))
         subscribe_url = urls['subscribe']
 
-        rest_invoke(server + subscribe_url, method="POST", params={'url' : url, 'method' : method})
+        self.rest_invoke(server + subscribe_url, method="POST", params={'url' : url, 'method' : method})
 
     def removeEvent(self, server, event, url):
         rm = []

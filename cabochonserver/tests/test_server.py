@@ -58,7 +58,7 @@ def test_server():
     #wait a second
     time.sleep(1)
     #insure that we got it
-    assert server_fixture.requests_received == [{'path': '/example/1', 'params': MultiDict([('morx', 'fleem')]), 'method': 'POST'}]            
+    assert server_fixture.requests_received == [{'path': '/example/1', 'params': MultiDict([('morx', 'fleem')]), 'method': 'POST'}], "Actually got %s" % server_fixture.requests_received
 
     installer2 = ServerInstaller(".servers")
 
