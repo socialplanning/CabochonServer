@@ -18,8 +18,9 @@ setup(name='CabochonServer',
       include_package_data=True,
       zip_safe=False,
       install_requires=[
-    "decorator",
-    "paste"
+        "CabochonClient",
+        "decorator",
+        "paste"
       ],
       entry_points="""
       # -*- Entry points: -*-
