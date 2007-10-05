@@ -18,7 +18,7 @@ setup(name='CabochonServer',
       include_package_data=True,
       zip_safe=False,
       install_requires=[
-        "CabochonClient",
+        "WSSEAuth",
         "decorator",
         "paste"
       ],

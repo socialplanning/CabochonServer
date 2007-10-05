@@ -3,7 +3,7 @@ from simplejson import loads
 from random import random
 from datetime import datetime
 from sha import sha
-from cabochonclient import wsse_header
+from wsseauth import wsse_header
 
 def fromjson(json):
     try:

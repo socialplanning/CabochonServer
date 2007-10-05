@@ -1,7 +1,7 @@
 from restclient import rest_invoke as base_rest_invoke
 from cabochonserver import ServerInstaller
 from cabochon.tests.functional import CabochonTestServer
-from cabochonclient import wsse_header
+from wsseauth import wsse_header
 from simplejson import loads as fromjson
 import os
 import time
