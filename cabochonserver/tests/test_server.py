@@ -29,7 +29,7 @@ def rest_invoke(*args, **kwargs):
     return base_rest_invoke(*args, **kwargs)
 
 def test_server():
-    print "Don't forget to start the event sender"
+
     test_server = CabochonTestServer()
     test_server.start()
     time.sleep(0.01) #time for the first line of the new thread to run
