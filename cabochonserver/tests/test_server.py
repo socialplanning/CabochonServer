@@ -2,7 +2,7 @@ from restclient import rest_invoke as base_rest_invoke
 from cabochonserver import ServerInstaller
 from cabochon.tests.functional import CabochonTestServer
 from wsseauth import wsse_header
-from simplejson import loads as fromjson
+from simplejson import loads as fromjson, dumps
 import os
 import time
 from random import random
@@ -26,6 +26,8 @@ def rest_invoke(*args, **kwargs):
     headers['X-WSSE'] = wsse_header(username, password)
 
     kwargs['headers'] = headers
+    if 'params' in kwargs:
+        kwargs['params'] = dict((key, dumps(value)) for key, value in kwargs['params'].items())                    
     return base_rest_invoke(*args, **kwargs)
 
 def test_server():
@@ -58,7 +60,7 @@ def test_server():
     #wait a second
     time.sleep(1)
     #insure that we got it
-    assert server_fixture.requests_received == [{'path': '/example/1', 'params': MultiDict([('morx', 'fleem')]), 'method': 'POST', 'username' : username}], "Actually got %s" % server_fixture.requests_received
+    assert server_fixture.requests_received == [{'path': '/example/1', 'params': MultiDict([('morx', '"fleem"')]), 'method': 'POST', 'username' : username}], "Actually got %s" % server_fixture.requests_received
 
     installer2 = ServerInstaller(".servers")
 

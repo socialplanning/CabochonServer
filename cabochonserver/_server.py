@@ -1,5 +1,5 @@
 from restclient import rest_invoke
-from simplejson import loads
+from simplejson import loads, dumps
 from random import random
 from datetime import datetime
 from sha import sha
@@ -38,6 +38,7 @@ class ServerInstaller:
             headers['X-WSSE'] = wsse_header(self.username, self.password)
 
             kwargs['headers'] = headers
+        kwargs['params'] = dict((key, dumps(value)) for key, value in kwargs['params'].items())                
         return rest_invoke(*args, **kwargs)
 
     def save(self):
