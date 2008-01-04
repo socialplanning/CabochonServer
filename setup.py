@@ -20,7 +20,8 @@ setup(name='CabochonServer',
       install_requires=[
         "WSSEAuth",
         "decorator",
-        "paste"
+        "paste",
+        "restclient",
       ],
       entry_points="""
       # -*- Entry points: -*-
