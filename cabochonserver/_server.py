@@ -12,6 +12,27 @@ def fromjson(json):
         print "Failed to load json from", json
         raise
 
+class Event(object):
+    """bag to hold event data"""
+    def __init__(self, server, event, url, method="POST"):
+        self.server = server.rstrip('/')
+        self.event = event
+        self.url = url
+        self.method = method
+    def __eq__(self, rhs):
+        return (self.server == rhs.server and
+                self.event == rhs.event and
+                self.url == rhs.url)
+    def __ne__(self, rhs):
+        return not (self == rhs)
+    def __str__(self):
+        return ','.join(
+            self.server,
+            self.event,
+            self.url,
+            self.method,
+            )
+
 class ServerInstaller:
     def __init__(self, config_file, username='', password=''):
         self.config_file = config_file
@@ -27,7 +48,8 @@ class ServerInstaller:
                     continue
                 if line.endswith("\n"):
                     line = line[:-1]         
-                self.events.append (tuple(line.split(",")))
+                e = Event(*line.split(','))
+                self.events.append(e)
         except:
             pass #no existing events file
 
@@ -42,13 +64,14 @@ class ServerInstaller:
         return rest_invoke(*args, **kwargs)
 
     def save(self):
+        if not self.events:
+            return
         f = open(self.config_file, "w")
-        for event in self.events:
-            f.write(",".join(event))
+        f.write('\n'.join(str(e) for e in self.events))
         f.close()
         
     def addEvent(self, server, event, url, method="POST"):
-        self.events.append((server, event, url, method))
+        self.events.append(Event(server, event, url, method))
         #create the event
         urls = fromjson(self.rest_invoke(server + "/event/", method="POST", params={"name" : event}))
         subscribe_url = urls['subscribe']
@@ -56,19 +79,28 @@ class ServerInstaller:
         self.rest_invoke(server + subscribe_url, method="POST", params={'url' : url, 'method' : method})
 
     def removeEvent(self, server, event, url):
-        rm = []
-        for candidate in self.events:
-            if candidate[0:3] == (server, event, url):
-                rm.append(candidate)
+        remove_event = Event(server, event, url)
+        rm = [e for e in self.events
+              if e == remove_event]
 
+        results = []
         for candidate in rm:
-            (server, event, url) = candidate
-            self.rest_invoke(server + "unsubscribe_by_event", method="POST", params={'url' : url, 'event' : event})
-            events.remove(candidate)
+            server = candidate.server
+            event = candidate.event
+            url = candidate.url
+            status = self.rest_invoke(server + "/unsubscribe_by_event", method="POST", params={'url' : url, 'event' : event})
+            results.append(status)
+            self.events.remove(candidate)
+        return '\n'.join(results)
 
 
     def removeAll(self):
+        results = []
         for e in self.events:
-            (server, event, url) = e
-            self.rest_invoke(server + "unsubscribe_by_event", method="POST", params={'url' : url, 'event' : event})
-            events.remove(e)
+            server = e.server
+            event = e.event
+            url = e.url
+            status = self.rest_invoke(server + "/unsubscribe_by_event", method="POST", params={'url' : url, 'event' : event})
+            results.append(status)
+        self.events = []
+        return '\n'.join(results)
