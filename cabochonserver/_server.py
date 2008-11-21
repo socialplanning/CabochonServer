@@ -26,12 +26,17 @@ class Event(object):
     def __ne__(self, rhs):
         return not (self == rhs)
     def __str__(self):
-        return ','.join(
+        return ','.join([
             self.server,
             self.event,
             self.url,
-            self.method,
+            self.method]
             )
+
+class ServerError(Exception):
+    def __init__(self, orig):
+        self.original_exception = orig
+        Exception.__init__(self)
 
 class ServerInstaller:
     def __init__(self, config_file, username='', password=''):
@@ -61,7 +66,10 @@ class ServerInstaller:
 
             kwargs['headers'] = headers
         kwargs['params'] = dict((key, dumps(value)) for key, value in kwargs['params'].items())                
-        return rest_invoke(*args, **kwargs)
+        try:
+            return rest_invoke(*args, **kwargs)
+        except socket.error, e:
+            raise ServerError(e)
 
     def save(self):
         if not self.events:

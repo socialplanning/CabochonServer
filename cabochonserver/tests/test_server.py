@@ -4,11 +4,13 @@ from cabochon.tests.functional import CabochonTestServer
 from wsseauth import wsse_header
 from simplejson import loads as fromjson, dumps
 import os
+import socket
 import time
 from random import random
 from datetime import datetime
 from sha import sha
 from paste.util.multidict import MultiDict
+
 
 username = 'topp'
 password = 'secret'
@@ -39,7 +41,11 @@ def test_server():
 
     server_url = "http://localhost:24532"
 
-    status, body = rest_invoke(server_url + "/event/", method="GET", resp=True)
+    try:
+        status, body = rest_invoke(server_url + "/event/", method="GET", resp=True)
+    except socket.error, e:
+        raise RuntimeError("You need a Cabochon server running on port 24532", e)
+
     if status['status'] != '200':
         raise RuntimeError("You need a Cabochon server running on port 24532")
 
@@ -60,7 +66,7 @@ def test_server():
     #wait a second
     time.sleep(1)
     #insure that we got it
-    assert server_fixture.requests_received == [{'path': '/example/1', 'params': MultiDict([('morx', '"fleem"')]), 'method': 'POST', 'username' : username}], "Actually got %s" % server_fixture.requests_received
+    assert server_fixture.requests_received == [{'path': '/example/1', 'params': MultiDict([('morx', '"fleem"')]), 'method': 'POST'}], "Actually got %s" % server_fixture.requests_received
 
     installer2 = ServerInstaller(".servers")
 
