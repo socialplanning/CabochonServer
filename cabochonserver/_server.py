@@ -34,9 +34,9 @@ class Event(object):
             )
 
 class ServerError(Exception):
-    def __init__(self, orig):
+    def __init__(self, reason, orig = None):
         self.original_exception = orig
-        Exception.__init__(self)
+        Exception.__init__(self, reason)
 
 class ServerInstaller:
     def __init__(self, config_file, username='', password=''):
@@ -69,7 +69,7 @@ class ServerInstaller:
         try:
             return rest_invoke(*args, **kwargs)
         except socket.error, e:
-            raise ServerError(e)
+            raise ServerError("Couldn't connect to server", e)
 
     def save(self):
         if not self.events:
@@ -81,10 +81,21 @@ class ServerInstaller:
     def addEvent(self, server, event, url, method="POST"):
         self.events.append(Event(server, event, url, method))
         #create the event
-        urls = fromjson(self.rest_invoke(server + "/event/", method="POST", params={"name" : event}))
+        try:
+            urls = fromjson(self.rest_invoke(server + "/event/", method="POST", params={"name" : event}))
+        except ValueError:
+            raise ServerError("Server returned non-json", e)
+        if not 'subscribe' in urls:
+            raise ServerError("Server returned a result without a subscribe url")            
         subscribe_url = urls['subscribe']
 
-        self.rest_invoke(server + subscribe_url, method="POST", params={'url' : url, 'method' : method})
+        try:
+            result = self.rest_invoke(server + subscribe_url, method="POST", params={'url' : url, 'method' : method})
+        except ValueError:
+            raise ServerError("Server returned non-json", e)
+        if not 'unsubscribe' in result:
+            raise ServerError("Server returned an unexpected result")
+
 
     def removeEvent(self, server, event, url):
         remove_event = Event(server, event, url)
